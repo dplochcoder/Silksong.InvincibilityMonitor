@@ -71,7 +71,7 @@ public partial class InvincibilityMonitorPlugin : BaseUnityPlugin, IModMenuCusto
         Logger.LogInfo($"Plugin {Name} ({Id}) has loaded!");
     }
 
-    public string ModMenuName() => "Invincibility Monitor";
+    public LocalizedText ModMenuName() => "Invincibility Monitor";
 
     public AbstractMenuScreen BuildCustomMenu()
     {
