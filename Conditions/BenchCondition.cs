@@ -20,7 +20,8 @@ internal class BenchCondition(InvincibilityMonitorPlugin plugin) : Invincibility
 
     private bool SetAtBench(PlayerData playerData, string name, bool value)
     {
-        if (name == nameof(PlayerData.atBench)) Active = value;
+        if (name == nameof(PlayerData.atBench))
+            Active = value;
         return value;
     }
 }

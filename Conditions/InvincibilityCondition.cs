@@ -1,6 +1,6 @@
-﻿using BepInEx.Configuration;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using BepInEx.Configuration;
 
 namespace Silksong.InvincibilityMonitor.Conditions;
 
@@ -17,7 +17,8 @@ internal abstract class InvincibilityCondition
         var config = plugin.Config.Bind(
             configDefinition: new("Conditions", Key),
             defaultValue: false,
-            configDescription: new(Description));
+            configDescription: new(Description)
+        );
 
         IsConditionEnabled = config.Value;
         IsEnabled = plugin.PluginEnabled && IsConditionEnabled;
@@ -27,9 +28,11 @@ internal abstract class InvincibilityCondition
             SettingChangedEventArgs typedArgs = (SettingChangedEventArgs)args;
             IsConditionEnabled = (bool)typedArgs.ChangedSetting.BoxedValue;
         };
-        plugin.OnPluginEnabledChanged += _ => IsEnabled = plugin.PluginEnabled && IsConditionEnabled;
+        plugin.OnPluginEnabledChanged += _ =>
+            IsEnabled = plugin.PluginEnabled && IsConditionEnabled;
 
-        if (IsEnabled) OnEnable();
+        if (IsEnabled)
+            OnEnable();
     }
 
     public abstract string Key { get; }
@@ -46,12 +49,15 @@ internal abstract class InvincibilityCondition
         bool nextEnabled = IsEnabled;
         if (nextEnabled != prevEnabled)
         {
-            if (nextEnabled) OnEnable();
-            else OnDisable();
+            if (nextEnabled)
+                OnEnable();
+            else
+                OnDisable();
         }
 
         bool nextEnabledAndActive = IsEnabledAndActive;
-        if (nextEnabledAndActive != prevEnabledAndActive) OnEnabledAndActiveChanged?.Invoke(nextEnabledAndActive);
+        if (nextEnabledAndActive != prevEnabledAndActive)
+            OnEnabledAndActiveChanged?.Invoke(nextEnabledAndActive);
     }
 
     protected bool IsEnabled
@@ -59,7 +65,8 @@ internal abstract class InvincibilityCondition
         get => field;
         private set
         {
-            if (field == value) return;
+            if (field == value)
+                return;
             DoUpdate(() => field = value);
         }
     }
@@ -69,7 +76,8 @@ internal abstract class InvincibilityCondition
         get => field;
         private set
         {
-            if (field == value) return;
+            if (field == value)
+                return;
             DoUpdate(() => field = value);
         }
     }
@@ -85,7 +93,8 @@ internal abstract class InvincibilityCondition
         get => field;
         set
         {
-            if (field == value) return;
+            if (field == value)
+                return;
             DoUpdate(() => field = value);
         }
     }
@@ -93,15 +102,18 @@ internal abstract class InvincibilityCondition
     // Invoked when IsEnabledAndActive changes.
     public event Action<bool>? OnEnabledAndActiveChanged;
 
-    internal static List<InvincibilityCondition> CreateAllConditions(InvincibilityMonitorPlugin plugin) => [
-        new AnimationCondition(plugin),
-        new BenchCondition(plugin),
-        new BossProgressionCondition(plugin),
-        new CutsceneCondition(plugin),
-        new DialogueCondition(plugin),
-        new NeedolinCondition(plugin),
-        new PickupCondition(plugin),
-        new RoarLockCondition(plugin),
-        new TransitioningCondition(plugin),
-    ];
+    internal static List<InvincibilityCondition> CreateAllConditions(
+        InvincibilityMonitorPlugin plugin
+    ) =>
+        [
+            new AnimationCondition(plugin),
+            new BenchCondition(plugin),
+            new BossProgressionCondition(plugin),
+            new CutsceneCondition(plugin),
+            new DialogueCondition(plugin),
+            new NeedolinCondition(plugin),
+            new PickupCondition(plugin),
+            new RoarLockCondition(plugin),
+            new TransitioningCondition(plugin),
+        ];
 }

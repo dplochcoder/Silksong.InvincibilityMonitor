@@ -6,7 +6,8 @@ internal class AnimationCondition(InvincibilityMonitorPlugin plugin) : CallbackC
 {
     public override string Key => "Animation";
 
-    protected override string Description => "Invincible when in any one of various dialogue or recovery animations.";
+    protected override string Description =>
+        "Invincible when in any one of various dialogue or recovery animations.";
 
     // For full list, in UEPlus run:
     // string.Join("\",\n\"", HeroController.instance.gameObject.GetComponent<tk2dSpriteAnimator>().Library.clips.Select(c => c.name).Where(n => n != "").OrderBy(n => n));
@@ -90,7 +91,8 @@ internal class AnimationCondition(InvincibilityMonitorPlugin plugin) : CallbackC
     protected override bool Callback()
     {
         var hc = HeroController.instance;
-        if (hc == null) return false;
+        if (hc == null)
+            return false;
 
         var clip = hc.gameObject.GetComponent<tk2dSpriteAnimator>().CurrentClip?.name;
         return clip != null && CLIPS.Contains(clip);

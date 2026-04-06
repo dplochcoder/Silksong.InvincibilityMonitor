@@ -1,11 +1,11 @@
-﻿using HutongGames.PlayMaker;
+﻿using System.Collections.Generic;
+using System.Linq;
+using HutongGames.PlayMaker;
 using HutongGames.PlayMaker.Actions;
 using MonoDetour;
 using MonoDetour.HookGen;
 using Silksong.FsmUtil;
 using Silksong.InvincibilityMonitor.Util;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Silksong.InvincibilityMonitor.Conditions;
 
@@ -14,29 +14,58 @@ internal class DialogueCondition : CallbackCondition
 {
     private static DialogueCondition? instance;
 
-    internal DialogueCondition(InvincibilityMonitorPlugin plugin) : base(plugin) => instance = this;
+    internal DialogueCondition(InvincibilityMonitorPlugin plugin)
+        : base(plugin) => instance = this;
 
     private readonly HashSet<PlayMakerFSM> activeShops = [];
     private readonly HashSet<Fsm> activeTolls = [];
     private readonly HashSet<QuestItemBoard> questBoards = [];
     private readonly HashSet<PlayMakerFSM> questBoardFsms = [];
 
-    private static readonly HashSet<string> boneBeastTravelStates = ["Open map", "Choose Scene", "Fade", "Hero Jump", "Hero Fire", "Jump Sing", "Time Passes", "Go To Stag Cutscene"];
+    private static readonly HashSet<string> boneBeastTravelStates =
+    [
+        "Open map",
+        "Choose Scene",
+        "Fade",
+        "Hero Jump",
+        "Hero Fire",
+        "Jump Sing",
+        "Time Passes",
+        "Go To Stag Cutscene",
+    ];
     private readonly HashSet<PlayMakerFSM> boneBeastFsms = [];
 
-    private static readonly HashSet<string> ventricaTravelStates = ["Interacted", "Hop In Antic", "Hop In", "Land In", "Open map", "Choose Scene", "Preload Scene", "Hero Press Button", "Close", "Leave", "Save State", "Fade Out", "Go To Next Scene"];
+    private static readonly HashSet<string> ventricaTravelStates =
+    [
+        "Interacted",
+        "Hop In Antic",
+        "Hop In",
+        "Land In",
+        "Open map",
+        "Choose Scene",
+        "Preload Scene",
+        "Hero Press Button",
+        "Close",
+        "Leave",
+        "Save State",
+        "Fade Out",
+        "Go To Next Scene",
+    ];
     private readonly HashSet<PlayMakerFSM> ventricaFsms = [];
 
     public override string Key => "Dialogue";
 
-    protected override string Description => "Whenever Hornet is engaged in any dialogue interaction.";
+    protected override string Description =>
+        "Whenever Hornet is engaged in any dialogue interaction.";
 
     protected override bool Callback() =>
         (QuestYesNoBox._instance != null && IsActive(QuestYesNoBox._instance.pane))
         || (QuestManager.instance != null && IsActive(QuestManager.instance))
         || (DialogueYesNoBox._instance != null && IsActive(DialogueYesNoBox._instance.pane))
         || (DialogueBox._instance != null && DialogueBox._instance.isDialogueRunning)
-        || activeShops.Any(s => s.Active && s.ActiveStateName != "Init" && s.ActiveStateName != "Idle")
+        || activeShops.Any(s =>
+            s.Active && s.ActiveStateName != "Init" && s.ActiveStateName != "Idle"
+        )
         || activeTolls.Count > 0
         || questBoards.Any(b => IsActive(b.pane))
         || questBoardFsms.Any(f => f.Active && f.ActiveStateName != "Idle")
@@ -44,10 +73,13 @@ internal class DialogueCondition : CallbackCondition
         || ventricaFsms.Any(v => ventricaTravelStates.Contains(v.ActiveStateName));
 
 #pragma warning disable IDE0075 // Cannot simplify because it's a Unity object.
-    private static bool IsActive(InventoryPaneBase? pane) => pane != null ? pane.IsPaneActive : false;
+    private static bool IsActive(InventoryPaneBase? pane) =>
+        pane != null ? pane.IsPaneActive : false;
 #pragma warning restore IDE0075
 
-    private static bool IsActive(QuestManager qm) => qm.spawnedQuestAcceptedSequence.activeInHierarchy || qm.spawnedQuestFinishedSequence.activeInHierarchy;
+    private static bool IsActive(QuestManager qm) =>
+        qm.spawnedQuestAcceptedSequence.activeInHierarchy
+        || qm.spawnedQuestFinishedSequence.activeInHierarchy;
 
     protected override void OnEnable()
     {
@@ -71,7 +103,21 @@ internal class DialogueCondition : CallbackCondition
 
     private void EditTollFsm(Fsm fsm)
     {
-        if (!fsm.HasStates(["Get Text", "Confirm", "Cancel", "Start Sequence", "Wait For Currency Counter", "Taking Currency", "Wait Frame", "Before Sequence Pause", "Keep Reach", "End"])) return;
+        if (
+            !fsm.HasStates([
+                "Get Text",
+                "Confirm",
+                "Cancel",
+                "Start Sequence",
+                "Wait For Currency Counter",
+                "Taking Currency",
+                "Wait Frame",
+                "Before Sequence Pause",
+                "Keep Reach",
+                "End",
+            ])
+        )
+            return;
 
         fsm.GetState("Start Sequence")!.AddMethod(() => activeTolls.Add(fsm));
         fsm.GetState("End")!.InsertMethod(0, () => activeTolls.Remove(fsm));

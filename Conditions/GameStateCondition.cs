@@ -1,14 +1,18 @@
-﻿using GlobalEnums;
+﻿using System.Collections.Generic;
+using GlobalEnums;
 using Silksong.InvincibilityMonitor.Util;
-using System.Collections.Generic;
 
 namespace Silksong.InvincibilityMonitor.Conditions;
 
-internal abstract class GameStateCondition(InvincibilityMonitorPlugin plugin, List<GameState> gameStates) : InvincibilityCondition(plugin)
+internal abstract class GameStateCondition(
+    InvincibilityMonitorPlugin plugin,
+    List<GameState> gameStates
+) : InvincibilityCondition(plugin)
 {
     protected override void OnEnable()
     {
-        Active = GameManager.instance != null && gameStates.Contains(GameManager.instance.GameState);
+        Active =
+            GameManager.instance != null && gameStates.Contains(GameManager.instance.GameState);
 
         Events.OnGameStateChanged += OnGameStateChanged;
         LifecycleUtil.OnGameManagerDestroy += OnGameManagerDestroy;

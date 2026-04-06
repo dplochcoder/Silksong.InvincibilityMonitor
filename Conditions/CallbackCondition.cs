@@ -1,6 +1,7 @@
 ﻿namespace Silksong.InvincibilityMonitor.Conditions;
 
-internal abstract class CallbackCondition(InvincibilityMonitorPlugin plugin) : InvincibilityCondition(plugin)
+internal abstract class CallbackCondition(InvincibilityMonitorPlugin plugin)
+    : InvincibilityCondition(plugin)
 {
     protected abstract bool Callback();
 

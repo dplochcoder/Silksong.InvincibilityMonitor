@@ -1,7 +1,7 @@
-﻿using MonoDetour;
-using MonoDetour.HookGen;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using MonoDetour;
+using MonoDetour.HookGen;
 
 namespace Silksong.InvincibilityMonitor.Util;
 
@@ -13,9 +13,11 @@ internal static class LifecycleUtil
 
     internal static event Action<GameManager> OnGameManagerAwake
     {
-        add {
+        add
+        {
             gmAwakeActions.Add(value);
-            if (GameManager.instance != null) value(GameManager.instance);
+            if (GameManager.instance != null)
+                value(GameManager.instance);
         }
         remove => gmAwakeActions.Remove(value);
     }
@@ -29,7 +31,8 @@ internal static class LifecycleUtil
         add
         {
             hcActions.Add(value);
-            if (HeroController.instance != null) value(HeroController.instance);
+            if (HeroController.instance != null)
+                value(HeroController.instance);
         }
         remove => hcActions.Remove(value);
     }
@@ -39,18 +42,22 @@ internal static class LifecycleUtil
     private static void GameManagerPostfixAwake(GameManager self)
     {
         List<Action<GameManager>> actions = [.. gmAwakeActions];
-        foreach (var action in actions) action(self);
+        foreach (var action in actions)
+            action(self);
     }
 
-    private static void GameManagerPostfixDestroy(GameManager self) => OnGameManagerDestroy?.Invoke(self);
+    private static void GameManagerPostfixDestroy(GameManager self) =>
+        OnGameManagerDestroy?.Invoke(self);
 
     private static void HeroControllerPostfixAwake(HeroController self)
     {
         List<Action<HeroController>> actions = [.. hcActions];
-        foreach (var action in actions) action(self);
+        foreach (var action in actions)
+            action(self);
     }
 
-    private static void HeroControllerPostfixDestroy(HeroController self) => OnHeroControllerDestroy?.Invoke(self);
+    private static void HeroControllerPostfixDestroy(HeroController self) =>
+        OnHeroControllerDestroy?.Invoke(self);
 
     [MonoDetourHookInitialize]
     private static void Hook()

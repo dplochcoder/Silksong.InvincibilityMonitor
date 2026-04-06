@@ -2,7 +2,8 @@
 
 namespace Silksong.InvincibilityMonitor.Conditions;
 
-internal class TransitioningCondition(InvincibilityMonitorPlugin plugin) : GameStateCondition(plugin, [GameState.ENTERING_LEVEL, GameState.EXITING_LEVEL])
+internal class TransitioningCondition(InvincibilityMonitorPlugin plugin)
+    : GameStateCondition(plugin, [GameState.ENTERING_LEVEL, GameState.EXITING_LEVEL])
 {
     public override string Key => "Transitioning";
 

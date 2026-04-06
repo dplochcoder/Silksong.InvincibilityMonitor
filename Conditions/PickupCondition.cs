@@ -1,7 +1,7 @@
-﻿using MonoDetour;
+﻿using System.Collections;
+using MonoDetour;
 using MonoDetour.HookGen;
 using Silksong.InvincibilityMonitor.Util;
-using System.Collections;
 
 namespace Silksong.InvincibilityMonitor.Conditions;
 
@@ -10,7 +10,8 @@ internal class PickupCondition : InvincibilityCondition
 {
     private static PickupCondition? instance;
 
-    internal PickupCondition(InvincibilityMonitorPlugin plugin) : base(plugin) => instance = this;
+    internal PickupCondition(InvincibilityMonitorPlugin plugin)
+        : base(plugin) => instance = this;
 
     public override string Key => "Pickup";
 
@@ -22,7 +23,8 @@ internal class PickupCondition : InvincibilityCondition
         IEnumerator Wrapped()
         {
             Active = true;
-            while (copy.MoveNext()) yield return copy.Current;
+            while (copy.MoveNext())
+                yield return copy.Current;
             Active = false;
         }
 
@@ -30,7 +32,8 @@ internal class PickupCondition : InvincibilityCondition
         routine = Wrapped();
     }
 
-    private static void PostfixPickup(CollectableItemPickup self, ref IEnumerator returnValue) => instance?.ModifyPickup(self, ref returnValue);
+    private static void PostfixPickup(CollectableItemPickup self, ref IEnumerator returnValue) =>
+        instance?.ModifyPickup(self, ref returnValue);
 
     [MonoDetourHookInitialize]
     private static void Hook() => Md.CollectableItemPickup.Pickup.Postfix(PostfixPickup);

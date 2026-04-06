@@ -3,11 +3,13 @@ using Silksong.InvincibilityMonitor.Util;
 
 namespace Silksong.InvincibilityMonitor.Conditions;
 
-internal class BossProgressionCondition(InvincibilityMonitorPlugin plugin) : InvincibilityCondition(plugin)
+internal class BossProgressionCondition(InvincibilityMonitorPlugin plugin)
+    : InvincibilityCondition(plugin)
 {
     public override string Key => "Boss Progression";
 
-    protected override string Description => "After last-hitting Widow, the First Sinner, Grandmother Silk, or Lost Lace.";
+    protected override string Description =>
+        "After last-hitting Widow, the First Sinner, Grandmother Silk, or Lost Lace.";
 
     protected override void OnEnable()
     {
@@ -32,13 +34,16 @@ internal class BossProgressionCondition(InvincibilityMonitorPlugin plugin) : Inv
     }
 
     // belltown_shrine
-    private void EditWeaver(PlayMakerFSM fsm) => fsm.GetState("Death Stagger")?.InsertMethod(0, () => Active = true);
+    private void EditWeaver(PlayMakerFSM fsm) =>
+        fsm.GetState("Death Stagger")?.InsertMethod(0, () => Active = true);
 
     // cradle_03
-    private void EditGMS(PlayMakerFSM fsm) => fsm.GetState("Death Hit")!.InsertMethod(0, () => Active = true);
+    private void EditGMS(PlayMakerFSM fsm) =>
+        fsm.GetState("Death Hit")!.InsertMethod(0, () => Active = true);
 
     // abyss_coccoon
-    private void EditLostLace(PlayMakerFSM fsm) => fsm.GetState("Allow Death")!.InsertMethod(0, () => Active = true);
+    private void EditLostLace(PlayMakerFSM fsm) =>
+        fsm.GetState("Allow Death")!.InsertMethod(0, () => Active = true);
 
     private void SetInactive() => Active = false;
 }

@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using BepInEx;
 using BepInEx.Bootstrap;
 using BepInEx.Configuration;
@@ -7,8 +9,6 @@ using Silksong.ModMenu.Elements;
 using Silksong.ModMenu.Models;
 using Silksong.ModMenu.Plugin;
 using Silksong.ModMenu.Screens;
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Silksong.InvincibilityMonitor;
@@ -32,18 +32,25 @@ public partial class InvincibilityMonitorPlugin : BaseUnityPlugin, IModMenuCusto
     {
         MonoDetourManager.InvokeHookInitializers(System.Reflection.Assembly.GetExecutingAssembly());
 
-        pluginEnabledConfig = Config.Bind(configDefinition: new("Main", "Enabled"),
+        pluginEnabledConfig = Config.Bind(
+            configDefinition: new("Main", "Enabled"),
             false,
-            configDescription: new("Whether to apply any invincibility rules at all."));
+            configDescription: new("Whether to apply any invincibility rules at all.")
+        );
         pluginEnabledConfig.SettingChanged += (_, args) =>
         {
             SettingChangedEventArgs typedArgs = (SettingChangedEventArgs)args;
             OnPluginEnabledChanged?.Invoke((bool)typedArgs.ChangedSetting.BoxedValue);
         };
 
-        gracePeriodConfig = Config.Bind(configDefinition: new("Main", "Grace Period"),
+        gracePeriodConfig = Config.Bind(
+            configDefinition: new("Main", "Grace Period"),
             0.2f,
-            new("Time (seconds) for invincibility to wear off.", tags: [(ConfigEntryFactory.MenuElementGenerator)CreateGracePeriodElement]));
+            new(
+                "Time (seconds) for invincibility to wear off.",
+                tags: [(ConfigEntryFactory.MenuElementGenerator)CreateGracePeriodElement]
+            )
+        );
 
         foreach (var condition in InvincibilityCondition.CreateAllConditions(this))
         {
@@ -55,18 +62,22 @@ public partial class InvincibilityMonitorPlugin : BaseUnityPlugin, IModMenuCusto
             void OnChange(bool value)
             {
                 bool prev = activeConditions[index];
-                if (prev == value) return;
+                if (prev == value)
+                    return;
 
                 activeConditions[index] = value;
-                if (value) ++numActiveConditions;
-                else --numActiveConditions;
+                if (value)
+                    ++numActiveConditions;
+                else
+                    --numActiveConditions;
             }
 
             OnChange(condition.IsEnabledAndActive);
             condition.OnEnabledAndActiveChanged += OnChange;
         }
 
-        if (Chainloader.PluginInfos.ContainsKey("io.github.hk-speedrunning.debugmod")) HookDebugMod();
+        if (Chainloader.PluginInfos.ContainsKey("io.github.hk-speedrunning.debugmod"))
+            HookDebugMod();
 
         Logger.LogInfo($"Plugin {Name} ({Id}) has loaded!");
     }
@@ -81,10 +92,13 @@ public partial class InvincibilityMonitorPlugin : BaseUnityPlugin, IModMenuCusto
         ConfigEntryFactory factory = new();
         foreach (var (configDefinition, configBase) in Config)
         {
-            if (!factory.GenerateMenuElement(configBase, out var menuElement)) continue;
+            if (!factory.GenerateMenuElement(configBase, out var menuElement))
+                continue;
 
-            if (configDefinition.Section == InvincibilityCondition.SECTION) conditionsBuilder.Add(menuElement);
-            else screen.Add(menuElement);
+            if (configDefinition.Section == InvincibilityCondition.SECTION)
+                conditionsBuilder.Add(menuElement);
+            else
+                screen.Add(menuElement);
         }
 
         TextButton subMenu = new("Conditions");
@@ -97,7 +111,22 @@ public partial class InvincibilityMonitorPlugin : BaseUnityPlugin, IModMenuCusto
 
     private static bool CreateGracePeriodElement(ConfigEntryBase entry, out MenuElement menuElement)
     {
-        ListSliderModel<float> model = new([0, 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f, 0.7f, 0.8f, 0.9f, 1.0f]) { DisplayFn = (idx, _) => $"{(idx / 10.0f):0.0}" };
+        ListSliderModel<float> model = new([
+            0,
+            0.1f,
+            0.2f,
+            0.3f,
+            0.4f,
+            0.5f,
+            0.6f,
+            0.7f,
+            0.8f,
+            0.9f,
+            1.0f,
+        ])
+        {
+            DisplayFn = (idx, _) => $"{(idx / 10.0f):0.0}",
+        };
         SliderElement<float> sliderElement = new("Grace Period", model);
         sliderElement.SynchronizeRawWith(entry);
 
@@ -105,9 +134,14 @@ public partial class InvincibilityMonitorPlugin : BaseUnityPlugin, IModMenuCusto
         return true;
     }
 
-    private void HookDebugMod() => DebugMod.DebugMod.AddTextToInfoPanel("Invincible", () => IsCurrentlyInvincible ? "Yes" : "No");
+    private void HookDebugMod() =>
+        DebugMod.DebugMod.AddTextToInfoPanel(
+            "Invincible",
+            () => IsCurrentlyInvincible ? "Yes" : "No"
+        );
 
-    private void OnEnable() => PrepatcherPlugin.PlayerDataVariableEvents<bool>.OnGetVariable += OverrideIsInvincible;
+    private void OnEnable() =>
+        PrepatcherPlugin.PlayerDataVariableEvents<bool>.OnGetVariable += OverrideIsInvincible;
 
     private void OnDisable()
     {
@@ -119,15 +153,17 @@ public partial class InvincibilityMonitorPlugin : BaseUnityPlugin, IModMenuCusto
 
     private bool IsCurrentlyInvincible => HasInvincibilityCondition || invincibilityCooldown > 0f;
 
-    private float invincibilityCooldown = 0f;  // Cooldown before invincibility goes away.
+    private float invincibilityCooldown = 0f; // Cooldown before invincibility goes away.
 
     private void UpdateInvincibility()
     {
-        if (HasInvincibilityCondition) invincibilityCooldown = gracePeriodConfig?.Value ?? 0;
+        if (HasInvincibilityCondition)
+            invincibilityCooldown = gracePeriodConfig?.Value ?? 0;
         else if (invincibilityCooldown > 0)
         {
             invincibilityCooldown -= Time.deltaTime;
-            if (invincibilityCooldown < 0) invincibilityCooldown = 0;
+            if (invincibilityCooldown < 0)
+                invincibilityCooldown = 0;
         }
     }
 
@@ -141,5 +177,6 @@ public partial class InvincibilityMonitorPlugin : BaseUnityPlugin, IModMenuCusto
         InvokeCallbacks();
     }
 
-    private bool OverrideIsInvincible(PlayerData playerData, string name, bool orig) => orig || (name == nameof(PlayerData.isInvincible) && IsCurrentlyInvincible);
+    private bool OverrideIsInvincible(PlayerData playerData, string name, bool orig) =>
+        orig || (name == nameof(PlayerData.isInvincible) && IsCurrentlyInvincible);
 }
